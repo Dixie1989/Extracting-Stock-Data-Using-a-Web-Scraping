@@ -1,0 +1,587 @@
+Not all stock data is available via API in this assignment; you will use web-scraping to 
+obtain financial data. You will be quizzed on your results. Using beautiful soup we will 
+extract historical share data from a web-page.
+#!pip install pandas==1.3.3
+#!pip install requests==2.26.0
+!mamba install bs4==4.10.0 -y
+!mamba install html5lib==1.1 -y
+!pip install lxml==4.6.4
+#!pip install plotly==5.3.1
+ __ __ __ __
+ / \ / \ / \ / \
+ / \/ \/ \/ \
+███████████████/ /██/ /██/ /██/ /████████████████████████
+ / / \ / \ / \ / \ \____
+ / / \_/ \_/ \_/ \ o \__,
+ / _/ \_____/ `
+ |/
+ ███╗ ███╗ █████╗ ███╗ ███╗██████╗ █████╗
+ ████╗ ████║██╔══██╗████╗ ████║██╔══██╗██╔══██╗
+ ██╔████╔██║███████║██╔████╔██║██████╔╝███████║
+ ██║╚██╔╝██║██╔══██║██║╚██╔╝██║██╔══██╗██╔══██║
+ ██║ ╚═╝ ██║██║ ██║██║ ╚═╝ ██║██████╔╝██║ ██║
+ ╚═╝ ╚═╝╚═╝ ╚═╝╚═╝ ╚═╝╚═════╝ ╚═╝ ╚═╝
+ mamba (0.15.3) supported by @QuantStack
+ GitHub: https://github.com/mamba-org/mamba
+ Twitter: https://twitter.com/QuantStack
+█████████████████████████████████████████████████████████████
+Looking for: ['bs4==4.10.0']
+pkgs/main/noarch [<=> ] (00m:00s) 
+pkgs/main/noarch [=> ] (00m:00s) 12 KB / ?? 
+(78.60 KB/s)
+pkgs/main/noarch [=> ] (00m:00s) 12 KB / ?? 
+(78.60 KB/s)
+pkgs/r/linux-64 [<=> ] (00m:00s) 
+pkgs/main/noarch [=> ] (00m:00s) 12 KB / ?? 
+(78.60 KB/s)
+pkgs/r/linux-64 [=> ] (00m:00s) 12 KB / ?? 
+(78.61 KB/s)
+pkgs/main/noarch [<=> ] (00m:00s) 12 KB / ?? 
+(78.60 KB/s)
+pkgs/r/linux-64 [=> ] (00m:00s) 12 KB / ?? 
+(78.61 KB/s)
+pkgs/main/noarch [<=> ] (00m:00s) 660 KB / ?? 
+(2.13 MB/s)
+pkgs/r/linux-64 [=> ] (00m:00s) 12 KB / ?? 
+(78.61 KB/s)
+pkgs/main/noarch [<=> ] (00m:00s) 660 KB / ?? 
+(2.13 MB/s)
+pkgs/r/linux-64 [<=> ] (00m:00s) 12 KB / ?? 
+(78.61 KB/s)
+pkgs/main/noarch [<=> ] (00m:00s) 660 KB / ?? 
+(2.13 MB/s)
+pkgs/r/linux-64 [<=> ] (00m:00s) 684 KB / ?? 
+(2.21 MB/s)
+pkgs/main/noarch [<=> ] (00m:00s) 660 KB / ?? 
+(2.13 MB/s)
+pkgs/r/linux-64 [<=> ] (00m:00s) 684 KB / ?? 
+(2.21 MB/s)
+pkgs/r/noarch [<=> ] (00m:00s) 
+pkgs/main/noarch [<=> ] (00m:00s) 660 KB / ?? 
+(2.13 MB/s)
+pkgs/r/linux-64 [<=> ] (00m:00s) 684 KB / ?? 
+(2.21 MB/s)
+pkgs/r/noarch [=> ] (00m:00s) 536 KB / ?? 
+(1.73 MB/s)
+pkgs/main/noarch [<=> ] (00m:00s) 660 KB / ?? 
+(2.13 MB/s)
+pkgs/r/linux-64 [<=> ] (00m:00s) 684 KB / ?? 
+(2.21 MB/s)
+pkgs/r/noarch [=> ] (00m:00s) 536 KB / ?? 
+(1.73 MB/s)
+pkgs/main/linux-64 [<=> ] (00m:00s) 
+pkgs/main/noarch [<=> ] (00m:00s) 660 KB / ?? 
+(2.13 MB/s)
+pkgs/r/linux-64 [<=> ] (00m:00s) 684 KB / ?? 
+(2.21 MB/s)
+pkgs/r/noarch [=> ] (00m:00s) 536 KB / ?? 
+(1.73 MB/s)
+pkgs/main/linux-64 [=> ] (00m:00s) 560 KB / ?? 
+(1.80 MB/s)
+pkgs/main/noarch [ <=> ] (00m:00s) 
+Finalizing...
+pkgs/r/linux-64 [<=> ] (00m:00s) 684 KB / ?? 
+(2.21 MB/s)
+pkgs/r/noarch [=> ] (00m:00s) 536 KB / ?? 
+(1.73 MB/s)
+pkgs/main/linux-64 [=> ] (00m:00s) 560 KB / ?? 
+(1.80 MB/s)
+pkgs/main/noarch [ <=> ] (00m:00s) Done
+pkgs/r/linux-64 [<=> ] (00m:00s) 684 KB / ?? 
+(2.21 MB/s)
+pkgs/r/noarch [=> ] (00m:00s) 536 KB / ?? 
+(1.73 MB/s)
+pkgs/main/linux-64 [=> ] (00m:00s) 560 KB / ?? 
+(1.80 MB/s)
+pkgs/main/noarch [====================] (00m:00s) Done
+pkgs/r/linux-64 [<=> ] (00m:00s) 684 KB / ?? 
+(2.21 MB/s)
+pkgs/r/noarch [=> ] (00m:00s) 536 KB / ?? 
+(1.73 MB/s)
+pkgs/main/linux-64 [=> ] (00m:00s) 560 KB / ?? 
+(1.80 MB/s)
+pkgs/r/linux-64 [<=> ] (00m:00s) 684 KB / ?? 
+(2.21 MB/s)
+pkgs/r/noarch [=> ] (00m:00s) 536 KB / ?? 
+(1.73 MB/s)
+pkgs/main/linux-64 [<=> ] (00m:00s) 560 KB / ?? 
+(1.80 MB/s)
+pkgs/r/linux-64 [<=> ] (00m:00s) 684 KB / ?? 
+(2.21 MB/s)
+pkgs/r/noarch [=> ] (00m:00s) 536 KB / ?? 
+(1.73 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.55 MB/s)
+pkgs/r/linux-64 [ <=> ] (00m:00s) 684 KB / ?? 
+(2.21 MB/s)
+pkgs/r/noarch [=> ] (00m:00s) 536 KB / ?? 
+(1.73 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.55 MB/s)
+pkgs/r/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.88 MB/s)
+pkgs/r/noarch [=> ] (00m:00s) 536 KB / ?? 
+(1.73 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.55 MB/s)
+pkgs/r/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.88 MB/s)
+pkgs/r/noarch [<=> ] (00m:00s) 536 KB / ?? 
+(1.73 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.55 MB/s)
+pkgs/r/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.88 MB/s)
+pkgs/r/noarch [ <=> ] (00m:00s) 1 MB / ?? 
+(2.46 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.55 MB/s)
+pkgs/r/linux-64 [ <=> ] (00m:00s) 
+Finalizing...
+pkgs/r/noarch [ <=> ] (00m:00s) 1 MB / ?? 
+(2.46 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.55 MB/s)
+pkgs/r/linux-64 [ <=> ] (00m:00s) Done
+pkgs/r/noarch [ <=> ] (00m:00s) 1 MB / ?? 
+(2.46 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.55 MB/s)
+pkgs/r/linux-64 [====================] (00m:00s) Done
+pkgs/r/noarch [ <=> ] (00m:00s) 1 MB / ?? 
+(2.46 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.55 MB/s)
+pkgs/r/noarch [ <=> ] (00m:00s) 
+Finalizing...
+pkgs/main/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.55 MB/s)
+pkgs/r/noarch [ <=> ] (00m:00s) Done
+pkgs/main/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.55 MB/s)
+pkgs/r/noarch [====================] (00m:00s) Done
+pkgs/main/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.55 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 1 MB / ?? 
+(2.55 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 2 MB / ?? 
+(2.92 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 2 MB / ?? 
+(2.92 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 2 MB / ?? 
+(3.01 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 2 MB / ?? 
+(3.01 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 3 MB / ?? 
+(3.17 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 3 MB / ?? 
+(3.17 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 4 MB / ?? 
+(3.29 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 4 MB / ?? 
+(3.29 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:00s) 4 MB / ?? 
+(3.34 MB/s)
+pkgs/main/linux-64 [ <=> ] (00m:01s) 
+Finalizing...
+pkgs/main/linux-64 [ <=> ] (00m:01s) Done
+pkgs/main/linux-64 [====================] (00m:01s) Done
+Pinned packages:
+ - python 3.7.*
+Transaction
+ Prefix: /home/jupyterlab/conda/envs/python
+ Updating specs:
+ - bs4==4.10.0
+ - ca-certificates
+ - certifi
+ - openssl
+ Package Version Build Channel 
+Size
+──────────────────────────────────────────────────────────────────────
+────────
+ Install:
+──────────────────────────────────────────────────────────────────────
+────────
+ + bs4 4.10.0 hd3eb1b0_0 pkgs/main/noarch 
+10 KB
+ Change:
+──────────────────────────────────────────────────────────────────────
+────────
+ - certifi 2022.6.15 py37h89c1867_0 installed 
+ + certifi 2022.6.15 py37h06a4308_0 pkgs/main/linux-64 
+153 KB
+ Upgrade:
+──────────────────────────────────────────────────────────────────────
+────────
+ - openssl 1.1.1p h166bdaf_0 installed 
+ + openssl 1.1.1q h7f8727e_0 pkgs/main/linux-64 
+3 MB
+ Downgrade:
+──────────────────────────────────────────────────────────────────────
+────────
+ - beautifulsoup4 4.11.1 pyha770c72_0 installed 
+ + beautifulsoup4 4.10.0 pyh06a4308_0 pkgs/main/noarch 
+85 KB
+ Summary:
+ Install: 1 packages
+ Change: 1 packages
+ Upgrade: 1 packages
+ Downgrade: 1 packages
+ Total download: 3 MB
+──────────────────────────────────────────────────────────────────────
+────────
+Downloading [> ] (00m:00s) 
+69.49 KB/s
+Extracting [> ]
+(--:--) 
+:00s) 10 KB 69 KB/s
+Downloading [> ] (00m:00s) 
+69.49 KB/s
+Extracting [> ]
+(--:--) 
+Downloading [> ] (00m:00s) 
+69.49 KB/s
+Extracting [> ]
+(--:--) 
+Downloading [> ] (00m:00s) 
+69.49 KB/s
+Extracting [> ]
+(--:--) 
+Downloading [> ] (00m:00s) 
+69.49 KB/s
+Extracting [==========> ] (00m:00s) 
+1 / 4
+Downloading [> ] (00m:00s) 
+114.08 KB/s
+Extracting [==========> ] (00m:00s) 
+1 / 4
+Downloading [> ] (00m:00s) 
+114.08 KB/s
+Extracting [==========> ] (00m:00s) 
+1 / 4
+Downloading [==> ] (00m:00s) 
+1.05 MB/s
+Extracting [==========> ] (00m:00s) 
+1 / 4
+:00s) 153 KB 1006 KB/s
+Downloading [==> ] (00m:00s) 
+1.05 MB/s
+Extracting [==========> ] (00m:00s) 
+1 / 4
+Downloading [==> ] (00m:00s) 
+1.05 MB/s
+Extracting [==========> ] (00m:00s) 
+1 / 4
+Downloading [==> ] (00m:00s) 
+1.05 MB/s
+Extracting [==========> ] (00m:00s) 
+1 / 4
+Downloading [==> ] (00m:00s) 
+1.05 MB/s
+Extracting [====================> ] (00m:00s) 
+2 / 4
+Downloading [===> ] (00m:00s) 
+1.52 MB/s
+Extracting [====================> ] (00m:00s) 
+2 / 4
+:00s) 85 KB 532 KB/s
+Downloading [===> ] (00m:00s) 
+1.52 MB/s
+Extracting [====================> ] (00m:00s) 
+2 / 4
+Downloading [===> ] (00m:00s) 
+1.52 MB/s
+Extracting [====================> ] (00m:00s) 
+2 / 4
+Downloading [===> ] (00m:00s) 
+1.52 MB/s
+Extracting [====================> ] (00m:00s) 
+2 / 4
+Downloading [===> ] (00m:00s) 
+1.52 MB/s
+Extracting [==============================> ] (00m:00s) 
+3 / 4
+Downloading [======> ] (00m:00s) 
+1.53 MB/s
+Extracting [==============================> ] (00m:00s) 
+3 / 4
+Downloading [======> ] (00m:00s) 
+1.53 MB/s
+Extracting [==============================> ] (00m:00s) 
+3 / 4
+Downloading [=========================================] (00m:00s) 
+6.36 MB/s
+Extracting [==============================> ] (00m:00s) 
+3 / 4
+:00s) 3 MB 6 MB/s
+Downloading [=========================================] (00m:00s) 
+6.36 MB/s
+Extracting [==============================> ] (00m:00s) 
+3 / 4
+Downloading [=========================================] (00m:00s) 
+6.36 MB/s
+Extracting [==============================> ] (00m:00s) 
+3 / 4
+Downloading [=========================================] (00m:00s) 
+6.36 MB/s
+Extracting [==============================> ] (00m:00s) 
+3 / 4
+Downloading [=========================================] (00m:00s) 
+6.36 MB/s
+Extracting [=========================================] (00m:00s) 
+4 / 4
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+ __ __ __ __
+ / \ / \ / \ / \
+ / \/ \/ \/ \
+███████████████/ /██/ /██/ /██/ /████████████████████████
+ / / \ / \ / \ / \ \____
+ / / \_/ \_/ \_/ \ o \__,
+ / _/ \_____/ `
+ |/
+ ███╗ ███╗ █████╗ ███╗ ███╗██████╗ █████╗
+ ████╗ ████║██╔══██╗████╗ ████║██╔══██╗██╔══██╗
+ ██╔████╔██║███████║██╔████╔██║██████╔╝███████║
+ ██║╚██╔╝██║██╔══██║██║╚██╔╝██║██╔══██╗██╔══██║
+ ██║ ╚═╝ ██║██║ ██║██║ ╚═╝ ██║██████╔╝██║ ██║
+ ╚═╝ ╚═╝╚═╝ ╚═╝╚═╝ ╚═╝╚═════╝ ╚═╝ ╚═╝
+ mamba (0.15.3) supported by @QuantStack
+ GitHub: https://github.com/mamba-org/mamba
+ Twitter: https://twitter.com/QuantStack
+█████████████████████████████████████████████████████████████
+Looking for: ['html5lib==1.1']
+pkgs/main/linux-64 Using cache
+pkgs/main/noarch Using cache
+pkgs/r/linux-64 Using cache
+pkgs/r/noarch Using cache
+Pinned packages:
+ - python 3.7.*
+Transaction
+ Prefix: /home/jupyterlab/conda/envs/python
+ Updating specs:
+ - html5lib==1.1
+ - ca-certificates
+ - certifi
+ - openssl
+ Package Version Build Channel Size
+──────────────────────────────────────────────────────────────────────
+─
+ Install:
+──────────────────────────────────────────────────────────────────────
+─
+ + html5lib 1.1 pyhd3eb1b0_0 pkgs/main/noarch 91 KB
+ + webencodings 0.5.1 py37_1 pkgs/main/linux-64 19 KB
+ Summary:
+ Install: 2 packages
+ Total download: 110 KB
+──────────────────────────────────────────────────────────────────────
+─
+Downloading [=================================> ] (00m:00s) 
+682.87 KB/s
+Extracting [> ]
+(--:--) 
+Downloading [=========================================] (00m:00s) 
+820.28 KB/s
+Extracting [> ]
+(--:--) 
+l5lib (00m:00s) 91 KB 679 
+KB/s
+Downloading [=========================================] (00m:00s) 
+820.28 KB/s
+Extracting [> ]
+(--:--) 
+:00s) 19 KB 142 KB/s
+Downloading [=========================================] (00m:00s) 
+820.28 KB/s
+Extracting [> ]
+(--:--) 
+Downloading [=========================================] (00m:00s) 
+820.28 KB/s
+Extracting [> ]
+(--:--) 
+Downloading [=========================================] (00m:00s) 
+820.28 KB/s
+Extracting [> ]
+(--:--) 
+Downloading [=========================================] (00m:00s) 
+820.28 KB/s
+Extracting [> ]
+(--:--) 
+Downloading [=========================================] (00m:00s) 
+820.28 KB/s
+Extracting [====================> ] (00m:00s) 
+1 / 2
+Downloading [=========================================] (00m:00s) 
+820.28 KB/s
+Extracting [====================> ] (00m:00s) 
+1 / 2
+Downloading [=========================================] (00m:00s) 
+820.28 KB/s
+Extracting [=========================================] (00m:00s) 
+2 / 2
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+Collecting lxml==4.6.4
+ Downloading lxml-4.6.4-cp37-cp37mmanylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl 
+(6.3 MB)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.3/6.3 MB 92.7 MB/s eta 
+0:00:00ta 0:00:01
+l
+ Attempting uninstall: lxml
+ Found existing installation: lxml 4.9.1
+ Uninstalling lxml-4.9.1:
+ Successfully uninstalled lxml-4.9.1
+Successfully installed lxml-4.6.4
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+Using Webscraping to Extract Stock Data Example
+First we must use the request library to downlaod the webpage, and extract the text. We 
+will extract Netflix stock data https://cf-courses-data.s3.us.cloud-objectstorage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/labs/
+project/netflix_data_webpage.html.
+url = "https://cf-courses-data.s3.us.cloud-objectstorage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220ENSkillsNetwork/labs/project/netflix_data_webpage.html"
+data = requests.get(url).text
+Next we must parse the text into html using beautiful_soup
+soup = BeautifulSoup(data, 'html5lib')
+Now we can turn the html table into a pandas dataframe
+netflix_data = pd.DataFrame(columns=["Date", "Open", "High", "Low", 
+"Close", "Volume"])
+# First we isolate the body of the table which contains all the 
+information
+# Then we loop through each row and find all the column values for 
+each row
+for row in soup.find("tbody").find_all('tr'):
+ col = row.find_all("td")
+ date = col[0].text
+ Open = col[1].text
+ high = col[2].text
+ low = col[3].text
+ close = col[4].text
+ adj_close = col[5].text
+ volume = col[6].text
+ 
+ # Finally we append the data of each row to the table
+ netflix_data = netflix_data.append({"Date":date, "Open":Open, 
+"High":high, "Low":low, "Close":close, "Adj Close":adj_close, 
+"Volume":volume}, ignore_index=True) 
+We can now print out the dataframe
+netflix_data.head()
+ Date Open High Low Close Volume Adj Close
+0 Jun 01, 2021 504.01 536.13 482.14 528.21 78,560,600 528.21
+1 May 01, 2021 512.65 518.95 478.54 502.81 66,927,600 502.81
+2 Apr 01, 2021 529.93 563.56 499.00 513.47 111,573,300 513.47
+3 Mar 01, 2021 545.57 556.99 492.85 521.66 90,183,900 521.66
+4 Feb 01, 2021 536.79 566.65 518.28 538.85 61,902,300 538.85
+We can also use the pandas read_html function using the url
+read_html_pandas_data = pd.read_html(url)
+Or we can convert the BeautifulSoup object to a string
+read_html_pandas_data = pd.read_html(str(soup))
+Beacause there is only one table on the page, we just take the first table in the list returned
+netflix_dataframe = read_html_pandas_data[0]
+netflix_dataframe.head()
+ Date Open High Low Close* Adj Close** Volume
+0 Jun 01, 2021 504.01 536.13 482.14 528.21 528.21 78560600
+1 May 01, 2021 512.65 518.95 478.54 502.81 502.81 66927600
+2 Apr 01, 2021 529.93 563.56 499.00 513.47 513.47 111573300
+3 Mar 01, 2021 545.57 556.99 492.85 521.66 521.66 90183900
+4 Feb 01, 2021 536.79 566.65 518.28 538.85 538.85 61902300
+Using Webscraping to Extract Stock Data Exercise
+Use the requests library to download the webpage https://cf-courses-data.s3.us.cloudobject-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/
+labs/project/amazon_data_webpage.html. Save the text of the response as a variable 
+named html_data.
+url = " https://cf-courses-data.s3.us.cloud-objectstorage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220ENSkillsNetwork/labs/project/amazon_data_webpage.html"
+data = requests.get(url).text 
+Parse the html data using beautiful_soup.
+soup = BeautifulSoup(data,'html5lib')
+html_data = pd.DataFrame(columns=["Date", "Open", "High", "Low", 
+"Close", "Adj Close","Volume"])
+for row in soup.find("tbody").find_all('tr'):
+ col = row.find_all("td")
+ date = col[0].text
+ Open = col[1].text
+ high = col[2].text
+ low = col[3].text
+ close = col[4].text
+ adj_close = col[5].text
+ volume = col[6].text
+ 
+html_data = html_data.append({"Date":date, "Open":Open, "High":high, 
+"Low":low, "Close":close, "Adj Close":adj_close, "Volume":volume}, 
+ignore_index=True) 
+html_data_dataframe = read_html_pandas_data[0]
+html_data_dataframe.head()
+ Date Open High Low Close* Adj Close** Volume
+0 Jun 01, 2021 504.01 536.13 482.14 528.21 528.21 78560600
+1 May 01, 2021 512.65 518.95 478.54 502.81 502.81 66927600
+2 Apr 01, 2021 529.93 563.56 499.00 513.47 513.47 111573300
+3 Mar 01, 2021 545.57 556.99 492.85 521.66 521.66 90183900
+4 Feb 01, 2021 536.79 566.65 518.28 538.85 538.85 61902300
+Question 1 What is the content of the title attribute:
+soup.find('title')
+<title>Amazon.com, Inc. (AMZN) Stock Historical Prices &amp; Data - 
+Yahoo Finance</title>
+Using beautiful soup extract the table with historical share prices and store it into a 
+dataframe named amazon_data. The dataframe should have columns Date, Open, High, 
+Low, Close, Adj Close, and Volume. Fill in each variable with the correct data from the list 
+col.
+amazon_data = pd.DataFrame(columns=["Date", "Open", "High", "Low", 
+"Close", "Adj Close","Volume"])
+for row in soup.find("tbody").find_all("tr"):
+ col = row.find_all("td")
+ date = col[0].text
+ Open = col[1].text
+ high = col[2].text
+ low = col[3].text
+ close = col[4].text
+ adj_close = col[5].text
+ volume = col[6].text
+ amazon_data = amazon_data.append({"Date":date, "Open":Open, 
+"High":high, "Low":low, "Close":close, "Adj Close":adj_close, 
+"Volume":volume}, ignore_index=True)
+ 
+Print out the first five rows of the amazon_data dataframe you created.
+amazon_data= amazon_data.head(5)
+print(amazon_data)
+ Date Open High Low Close Adj Close 
+Volume
+0 Jan 01, 2021 3,270.00 3,363.89 3,086.00 3,206.20 3,206.20 
+71,528,900
+1 Dec 01, 2020 3,188.50 3,350.65 3,072.82 3,256.93 3,256.93 
+77,556,200
+2 Nov 01, 2020 3,061.74 3,366.80 2,950.12 3,168.04 3,168.04 
+90,810,500
+3 Oct 01, 2020 3,208.00 3,496.24 3,019.00 3,036.15 3,036.15 
+116,226,100
+4 Sep 01, 2020 3,489.58 3,552.25 2,871.00 3,148.73 3,148.73 
+115,899,300
+Question 2 What is the name of the columns of the dataframe
+amazon_data.columns
+Index(['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume'],
+dtype='object')
+Question 3 What is the Open of the last row of the amazon_data dataframe?
+amazon_data.tail()
+ Date Open High Low Close Adj Close 
+Volume
+0 Jan 01, 2021 3,270.00 3,363.89 3,086.00 3,206.20 3,206.20 
+71,528,900
+1 Dec 01, 2020 3,188.50 3,350.65 3,072.82 3,256.93 3,256.93 
+77,556,200
+2 Nov 01, 2020 3,061.74 3,366.80 2,950.12 3,168.04 3,168.04 
+90,810,500
+3 Oct 01, 2020 3,208.00 3,496.24 3,019.00 3,036.15 3,036.15 
+116,226,100
+4 Sep 01, 2020 3,489.58 3,552.25 2,871.00 3,148.73 3,148.73 
+115,899,300
+Joseph Santarcangelo has a PhD in Electrical Engineering, his research focused on using 
+machine learning, signal processing, and computer vision to determine how videos impact 
+human cognition. Joseph has been working for IBM since he completed his PhD.
+Azim Hirjani
+Change Log
+Date (YYYY-MM-DD)
+| 2021-06-09 | 1.2 | Lakshmi Holla|Added URL in question 3 |
+| 2020-11-10 | 1.1 | Malika Singla | Deleted the Optional part | | 2020-08-27 | 1.0 | Malika 
+Singla | Added lab to GitLab |
+ © IBM Corporation 2020. All rights reserved. 
